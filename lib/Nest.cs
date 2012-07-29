@@ -230,6 +230,37 @@ namespace WiredPrairieUS.Devices
             }
         }
 
+        public static double FahrenheitToCelsius(string temperatureFahrenheit)
+        {
+            double fahrenheit = System.Double.Parse(temperatureFahrenheit);
+            return (fahrenheit - 32) * 5 / 9;
+        }
+
+        public void SetTemp(string TempInF)
+        {
+            var transport = string.Format("{0}/v2/put/shared.{1}",
+                TransportAPIUrl, _structures[0].Devices[0].Id.ToString());
+            System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
+            HttpWebRequest request = WebRequest.Create(transport) as HttpWebRequest;
+
+            request.Method = "POST";
+            request.UserAgent = "Nest/1.1.0.10 CFNetwork/548.0.4";
+            request.Host = new Uri(TransportAPIUrl).Host;
+            request.Headers.Set("X-nl-protocol-version", "1");
+            request.Headers.Set("Authorization", string.Format("Basic {0}", AccessToken));
+
+            string json = "{\"target_change_pending\":true, \"target_temperature\": " + FahrenheitToCelsius(TempInF) + " }";
+
+            byte[] data = encoding.GetBytes(json);
+            Stream newStream = request.GetRequestStream();
+            // Send the data.
+            newStream.Write(data, 0, data.Length);
+            newStream.Close();
+
+            request.BeginGetResponse(GetCurrentStatusCallback,
+                new AsyncHttpRequestState ( request ));
+        }
+
         public void DeconstructStatus(string jsonBody)
         {
             DeconstructStatus(JsonConvert.DeserializeObject(jsonBody));
