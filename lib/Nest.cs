@@ -25,6 +25,7 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace WiredPrairieUS.Devices
 {
@@ -86,7 +87,7 @@ namespace WiredPrairieUS.Devices
             }
 
             request.BeginGetResponse(AuthenticateCallback, 
-                new AsyncHttpRequestState { Request = request });
+                new AsyncHttpRequestState( request ));
         }
 
         private void AuthenticateCallback(IAsyncResult result)
@@ -109,11 +110,12 @@ namespace WiredPrairieUS.Devices
                             try
                             {
                                 ParseAuthenticationResponse(responseBody);
-                                OnAuthenticationComplete();
+                                state.Context.Send(new SendOrPostCallback(OnAuthenticationComplete), null);
+
                             }
                             catch (Exception ex)
                             {
-                                OnAuthenticationFailure(ex);
+                                state.Context.Send(new SendOrPostCallback(OnAuthenticationFailure), ex);
                                 Debug.WriteLine(ex);
                             }
                         }
@@ -149,15 +151,15 @@ namespace WiredPrairieUS.Devices
 
 
 
-        protected virtual void OnAuthenticationFailure(Exception ex)
+        protected virtual void OnAuthenticationFailure(Object ex)
         {
             if (AuthenticationFailed != null)
             {
-                AuthenticationFailed(this, new FailedAuthenticationEventArgs(ex));
+                AuthenticationFailed(this, new FailedAuthenticationEventArgs((Exception)ex));
             }
         }
 
-        protected virtual void OnAuthenticationComplete ()
+        protected virtual void OnAuthenticationComplete (Object o)
         {
             if (AuthenticationComplete != null)
             {
@@ -182,7 +184,7 @@ namespace WiredPrairieUS.Devices
             request.Headers.Set("Authorization", string.Format("Basic {0}", AccessToken));
 
             request.BeginGetResponse(GetCurrentStatusCallback,
-                new AsyncHttpRequestState { Request = request });
+                new AsyncHttpRequestState( request ));
         }
 
         private void GetCurrentStatusCallback(IAsyncResult result)
@@ -206,7 +208,7 @@ namespace WiredPrairieUS.Devices
                                 if (jBody != null)
                                 {
                                     DeconstructStatus(jBody);
-                                    OnStatusUpdated(jBody);
+                                    state.Context.Send(new SendOrPostCallback(OnStatusUpdated),jBody);
                                 }
                             }
                             catch (Exception ex)
@@ -310,7 +312,13 @@ namespace WiredPrairieUS.Devices
 
 public class AsyncHttpRequestState
 {
-    public HttpWebRequest Request { get; set; }
+    public AsyncHttpRequestState(HttpWebRequest request) 
+    {
+        Request = request;
+        Context = SynchronizationContext.Current;
+    }
+    public HttpWebRequest Request { get; private set; }
+    public SynchronizationContext Context { get; private set; }
 }
 
 
