@@ -11,26 +11,32 @@
 	<Grid x:Name="LayoutRoot">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="20"/>
+			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
 		<Rectangle Fill="{DynamicResource LoginLabelForegroundBrush}" RadiusX="8" RadiusY="8" StrokeThickness="0"/>
-		<Border BorderBrush="#FF888D84" BorderThickness="6" Margin="8" Grid.Row="1" Grid.RowSpan="1" Background="#FFD1DACA" CornerRadius="12">
-			<Grid Margin="12">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="0.146*"/>
-					<RowDefinition Height="0.708*"/>
-					<RowDefinition Height="0.146*"/>
-				</Grid.RowDefinitions>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="0.124*"/>
-					<ColumnDefinition Width="0.684*"/>
-					<ColumnDefinition Width="0.124*"/>
-				</Grid.ColumnDefinitions>
-				<TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Text="{Binding CurrentTemperatureF, FallbackValue=70}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="96" Foreground="#A5000000" />					
-			</Grid>
-		</Border>
-		<Rectangle Fill="{DynamicResource LoginLabelForegroundBrush}" Grid.Row="4"/>
+        <!-- magic numbers for the ArcSegment calculated as follows 
+             Path width and height is 230x230, putting the center at 115,115
+             Given a stroke thickness of 20, the radius of the circle is 115-(20/2) = 105
+             Given a 60 degree cutout at the bottom the start and end points are at 240degrees and 300degrees
+             via polar->rectangular coordinate transformation we get
+                startpoint=(115+105 * cos(240deg), 115-105*sin(240degrees) = (62.5,205.9)
+                endpoint=(115+105 * cos(300deg), 115-105*sin(300degrees)   = (167.5,205.9)
+        -->
+        <Path Grid.Row="1" Grid.Column="1" Height="230" Width="230" Margin="8" StrokeThickness="20" Stroke="#A5000000" StrokeDashArray=".1 .15">
+            <Path.Data>
+                <PathGeometry>
+                    <PathGeometry.Figures>
+                        <PathFigure StartPoint="62.5,205.9">
+                            <PathFigure.Segments>
+                                <ArcSegment Size="105,105" IsLargeArc="True" SweepDirection="Clockwise" Point="167.5,205.9"/>
+                            </PathFigure.Segments>
+                        </PathFigure>
+                    </PathGeometry.Figures>
+                </PathGeometry>
+            </Path.Data>
+        </Path>
+        <TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Text="{Binding CurrentTemperatureF, FallbackValue=70}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="96" Foreground="#A5000000" />					
 		<TextBlock TextWrapping="Wrap" Text="{Binding Path=Name, FallbackValue=Thermostat}" FontSize="18.667" TextTrimming="CharacterEllipsis" TextAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Opacity="0.655" Margin="6,12"/>
 	</Grid>
 </UserControl>
+    
