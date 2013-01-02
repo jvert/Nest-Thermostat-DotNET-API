@@ -41,6 +41,7 @@ namespace WiredPrairieUS.Devices
             CanHeat = shared.can_heat;
             CurrentTemperatureC = shared.current_temperature;
             TargetTemperatureHighC = shared.target_temperature_high;
+            TargetTemperatureC = shared.target_temperature;
         }
 
         private bool _hvacFanState;
@@ -111,6 +112,36 @@ namespace WiredPrairieUS.Devices
                 {
                     _currentTemperatureF = value;
                     RaisePropertyChanged("CurrentTemperatureF");
+                }
+            }
+        }
+
+        private double _targetTemperatureC;
+        public double TargetTemperatureC
+        {
+            get { return _targetTemperatureC; }
+            private set
+            {
+                if (value != _targetTemperatureC)
+                {
+                    _targetTemperatureC = value;
+                    RaisePropertyChanged("TargetTemperatureC");
+                    // Celcius sets Fahrenheit, always
+                    TargetTemperatureF = Nest.CelsiusToFohrenheit(_targetTemperatureC);
+                }
+            }
+        }
+
+        private double _targetTemperatureF;
+        public double TargetTemperatureF
+        {
+            get { return _targetTemperatureF; }
+            private set
+            {
+                if (value != _targetTemperatureF)
+                {
+                    _targetTemperatureF = value;
+                    RaisePropertyChanged("TargetTemperatureF");
                 }
             }
         }

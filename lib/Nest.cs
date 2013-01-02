@@ -236,10 +236,10 @@ namespace WiredPrairieUS.Devices
             return (fahrenheit - 32) * 5 / 9;
         }
 
-        public void SetTemp(string TempInF)
+        public void SetTemp(string DeviceId, string TempInF)
         {
             var transport = string.Format("{0}/v2/put/shared.{1}",
-                TransportAPIUrl, _structures[0].Devices[0].Id.ToString());
+                TransportAPIUrl, DeviceId.ToString());
             System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
             HttpWebRequest request = WebRequest.Create(transport) as HttpWebRequest;
 
@@ -257,8 +257,57 @@ namespace WiredPrairieUS.Devices
             newStream.Write(data, 0, data.Length);
             newStream.Close();
 
-            request.BeginGetResponse(GetCurrentStatusCallback,
+            request.BeginGetResponse(SetTempCallback,
                 new AsyncHttpRequestState ( request ));
+        }
+
+        //
+        // Not sure what kind of response we are expected to get back 
+        // from a set target_temperature POST. No matter what we get
+        // we will issue a new GetCurrentStatus request to refresh the
+        // data
+        //
+        private void SetTempCallback(IAsyncResult result)
+        {
+            AsyncHttpRequestState state = result.AsyncState as AsyncHttpRequestState;
+            if (state != null)
+            {
+                try
+                {
+                    HttpWebResponse response = state.Request.EndGetResponse(result) as HttpWebResponse;
+                    string responseBody;
+
+                    using (Stream stream = response.GetResponseStream())
+                    {
+                        using (StreamReader reader = new StreamReader(stream))
+                        {
+                            responseBody = reader.ReadToEnd();
+                            try
+                            {
+                                dynamic jBody = JsonConvert.DeserializeObject(responseBody);
+                                if (jBody != null)
+                                {
+                                    DeconstructStatus(jBody);
+                                    state.Context.Send(new SendOrPostCallback(OnStatusUpdated), jBody);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                OnNestException(ex);
+                                Debug.WriteLine(ex);
+                            }
+                        }
+                    }
+
+                    response.Close();
+                }
+                catch (Exception ex)
+                {
+                    OnNestException(ex);
+                    Debug.WriteLine(ex);
+                }
+
+            }
         }
 
         public void DeconstructStatus(string jsonBody)

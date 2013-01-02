@@ -17,6 +17,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
 using System.Windows;
+using System.Windows.Controls;
 using WiredPrairieUS.Demo.Properties;
 using WiredPrairieUS.Devices;
 using System.IO;
@@ -41,22 +42,10 @@ namespace WiredPrairieUS.Demo
 
         private void btnLogin_Click(object sender, RoutedEventArgs e)
         {
-#if DEBUG
-            _nest = new Nest("test@example", "password");
-            // you'll need your own test file (you can build one by grabbing the output of the calls
-            string body = File.ReadAllText(@"d:\Aaron\Documents\nest-login1.txt");
-            _nest.ParseAuthenticationResponse(body);
-            // you'll need your own test file (you can build one by grabbing the output of the calls
-            body = File.ReadAllText(@"d:\Aaron\Documents\nest-status1.txt");
-            _nest.DeconstructStatus(body);
-            UpdateDevices();
-#else
             _nest = new Nest(txtLogin.Text, txtPassword.Password);
             _nest.AuthenticationComplete += new EventHandler<EventArgs>(Nest_AuthenticationComplete);
             _nest.StatusUpdated += new EventHandler<NestStatusUpdatedEventArgs>(Nest_StatusUpdated);
             _nest.BeginAuthenticate();
-
-#endif
         }
 
         void Nest_StatusUpdated(object sender, NestStatusUpdatedEventArgs e)
@@ -84,6 +73,23 @@ namespace WiredPrairieUS.Demo
             btnLogin.IsEnabled = false;
 
             _nest.BeginGetCurrentStatus();
+        }
+
+        private void TempChange_Click(object sender, RoutedEventArgs e)
+        {
+            Button b = (Button)e.OriginalSource;
+            Device d = (Device)b.DataContext;
+
+            if (b.Name == "TempUp")
+            {
+                _nest.SetTemp(d.Id,(d.TargetTemperatureF + 1).ToString());
+
+            }
+            else if (b.Name == "TempDown")
+            {
+                _nest.SetTemp(d.Id, (d.TargetTemperatureF - 1).ToString());
+            }
+
         }
     }
 }

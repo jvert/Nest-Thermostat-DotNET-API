@@ -31,7 +31,7 @@
     	</Border>
     	<Grid Margin="8" Grid.Row="1">
     		<ScrollViewer Margin="8" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Hidden">
-    			<ItemsControl ItemsSource="{Binding Devices}" ItemTemplate="{DynamicResource ThermostatItemTemplate}" ItemsPanel="{DynamicResource ThermostatViewItemsPanel}">
+    			<ItemsControl ItemsSource="{Binding Devices}" ItemTemplate="{DynamicResource ThermostatItemTemplate}" ItemsPanel="{DynamicResource ThermostatViewItemsPanel}" Button.Click="TempChange_Click">
     							
 				</ItemsControl>
     		</ScrollViewer>

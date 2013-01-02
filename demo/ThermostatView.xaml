@@ -35,7 +35,11 @@
                 </PathGeometry>
             </Path.Data>
         </Path>
-        <TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Text="{Binding CurrentTemperatureF, FallbackValue=70}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="96" Foreground="#A5000000" />					
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" >
+            <Button x:Name="TempUp" Content="Up" FontSize="18" HorizontalAlignment="Center" Padding="1" Margin="0,8,0,0" />
+            <TextBlock Text="{Binding TargetTemperatureF, FallbackValue=70}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="96" Foreground="#A5000000" />
+            <Button x:Name="TempDown" Content="Down" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,8" />
+        </StackPanel>
 		<TextBlock TextWrapping="Wrap" Text="{Binding Path=Name, FallbackValue=Thermostat}" FontSize="18.667" TextTrimming="CharacterEllipsis" TextAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Opacity="0.655" Margin="6,12"/>
 	</Grid>
 </UserControl>
