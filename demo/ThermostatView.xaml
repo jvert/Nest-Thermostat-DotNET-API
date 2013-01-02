@@ -36,9 +36,9 @@
             </Path.Data>
         </Path>
         <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" >
-            <Button x:Name="TempUp" Content="5" FontSize="36" HorizontalAlignment="Center" Padding="0" Margin="0,8,0,0" FontFamily="Webdings" BorderThickness="0" Background="{x:Null}" Foreground="#A5000000"  />
+            <Button x:Name="TempUp" Content="˄" FontSize="36" HorizontalAlignment="Center" Padding="0" Margin="0,8,0,0" FontFamily="Tahoma" BorderThickness="0" Background="{x:Null}" Foreground="#A5000000"  />
             <TextBlock Text="{Binding TargetTemperatureF, FallbackValue=70}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="80" Foreground="#A5000000" />
-            <Button x:Name="TempDown" FontFamily="Webdings" Content="6" FontSize="36" HorizontalAlignment="Center" Padding="0" Margin="0,0,0,8" BorderThickness="0" Background="{x:Null}" Foreground="#A5000000"  />
+            <Button x:Name="TempDown" FontFamily="Tahoma" Content="˅" FontSize="36" HorizontalAlignment="Center" Padding="0" Margin="0,0,0,8" BorderThickness="0" Background="{x:Null}" Foreground="#A5000000"  />
         </StackPanel>
 		<TextBlock TextWrapping="Wrap" Text="{Binding Path=Name, FallbackValue=Thermostat}" FontSize="18.667" TextTrimming="CharacterEllipsis" TextAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Opacity="0.655" Margin="6,12"/>
 	</Grid>
